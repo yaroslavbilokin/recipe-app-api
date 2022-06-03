@@ -107,7 +107,7 @@ class PublicUserApiTests(TestCase):
         """ Test authentication is required for users. """
         res = self.client.get(ME_URL)
 
-        self.assertEqual(res.status_code, status.HTTP_401_BAD_UNAUTHORIZED)
+        self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
 
 
 class PrivateUserApiTests(TestCase):
@@ -115,9 +115,9 @@ class PrivateUserApiTests(TestCase):
 
     def setUp(self):
         self.user = create_user(
-            email='test@xample.com',
+            email='test@example.com',
             password='testpass123',
-            name='Test Name'
+            name='Test Name',
         )
         self.client = APIClient()
         self.client.force_authenticate(user=self.user)
@@ -128,8 +128,8 @@ class PrivateUserApiTests(TestCase):
 
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(res.data, {
+            'name': self.user.name,
             'email': self.user.email,
-            'name': self.user.name
         })
 
     def test_post_me_not_allowed(self):
@@ -139,8 +139,8 @@ class PrivateUserApiTests(TestCase):
         self.assertEqual(res.status_code, status.HTTP_405_METHOD_NOT_ALLOWED)
 
     def test_update_user_profile(self):
-        """ Test updating the user for the authenticated user. """
-        payload = {'name': 'Updated Name', 'password': 'newpass123'}
+        """ Test updating the user profile for the authenticated user. """
+        payload = {'name': 'Updated Name', 'password': 'newpassword123'}
 
         res = self.client.patch(ME_URL, payload)
 
